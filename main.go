@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	
+	"syscall"
 )
 
 func main() {
@@ -18,6 +18,11 @@ func main() {
 	fmt.Printf("Parent PID: %d\n", os.Getpid())
 
 	cmd := exec.Command(os.Args[2], os.Args[3:]...)
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		// create new * namesapce for child process
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID,
+	}
+
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
